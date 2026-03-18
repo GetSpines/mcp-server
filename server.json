@@ -1,0 +1,18 @@
+{
+  "name": "@spines/mcp-server",
+  "display_name": "SPINES - Book Collections & Shelfology",
+  "description": "Access book collections, reading lists, and bookshelf recognition from AI assistants. Search books, explore what notable people read, and manage your library.",
+  "version": "1.0.0",
+  "transport": ["stdio"],
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "prompts": true
+  },
+  "tags": ["books", "reading", "collections", "bookshelf", "ai", "recognition", "library"],
+  "homepage": "https://getspines.com/developers",
+  "repository": "https://github.com/GetSpines/mcp-server",
+  "license": "MIT",
+  "author": "SPINES",
+  "npm": "@spines/mcp-server"
+}

@@ -1,0 +1,29 @@
+name: MCP Inspector
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Weekly on Monday at 9 AM UTC
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Run MCP Inspector
+        run: |
+          npx @modelcontextprotocol/inspector --cli dist/index.js --method tools/list 2>&1 | tee inspector-output.txt
+          if grep -q '"tools"' inspector-output.txt; then
+            echo "✅ MCP Inspector: tools listed successfully"
+          else
+            echo "❌ MCP Inspector: failed to list tools"
+            exit 1
+          fi
+        env:
+          SPINES_API_KEY: ${{ secrets.SPINES_TEST_API_KEY }}

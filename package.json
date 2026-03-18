@@ -1,0 +1,44 @@
+{
+  "name": "@spines/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for SPINES — access book collections, reading lists, and bookshelf recognition from AI assistants",
+  "keywords": ["mcp", "model-context-protocol", "books", "bookshelf", "collections", "reading-list", "ai", "llm"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "spines-mcp": "./dist/index.js"
+  },
+  "files": ["dist", "README.md", "server.json", "CHANGELOG.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0",
+    "eslint": "^8.56.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GetSpines/mcp-server"
+  },
+  "homepage": "https://getspines.com/developers",
+  "bugs": {
+    "url": "https://github.com/GetSpines/mcp-server/issues"
+  }
+}
