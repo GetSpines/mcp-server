@@ -18,7 +18,7 @@ jobs:
       - run: npm run build
       - name: Run MCP Inspector
         run: |
-          npx @modelcontextprotocol/inspector --cli dist/index.js --method tools/list 2>&1 | tee inspector-output.txt
+          npx @modelcontextprotocol/inspector --cli node dist/index.js --method tools/list 2>&1 | tee inspector-output.txt
           if grep -q '"tools"' inspector-output.txt; then
             echo "✅ MCP Inspector: tools listed successfully"
           else
