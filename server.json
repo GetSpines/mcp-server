@@ -1,18 +1,29 @@
 {
-  "name": "@spines/mcp-server",
-  "display_name": "SPINES - Book Collections & Shelfology",
-  "description": "Access book collections, reading lists, and bookshelf recognition from AI assistants. Search books, explore what notable people read, and manage your library.",
-  "version": "1.0.0",
-  "transport": ["stdio"],
-  "capabilities": {
-    "tools": true,
-    "resources": true,
-    "prompts": true
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.SuperAgentic/spines",
+  "description": "Access book collections, reading lists, and bookshelf recognition from AI assistants.",
+  "repository": {
+    "url": "https://github.com/GetSpines/mcp-server",
+    "source": "github"
   },
-  "tags": ["books", "reading", "collections", "bookshelf", "ai", "recognition", "library"],
-  "homepage": "https://getspines.com/developers",
-  "repository": "https://github.com/GetSpines/mcp-server",
-  "license": "MIT",
-  "author": "SPINES",
-  "npm": "@spines/mcp-server"
+  "version": "1.0.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@spines/mcp-server",
+      "version": "1.0.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Your SPINES API key",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "SPINES_API_KEY"
+        }
+      ]
+    }
+  ]
 }
