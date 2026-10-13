@@ -3,7 +3,7 @@ import { SpinesClient, SpinesApiError } from '../src/client.js';
 
 const mockConfig = {
   apiKey: 'gtspn_test_abc123',
-  apiUrl: 'https://spins.app/api/v1',
+  apiUrl: 'https://getspines.com/api/v1',
   debug: false,
 };
 
@@ -25,7 +25,7 @@ describe('SpinesClient', () => {
       const result = await client.get('/books/1');
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://spins.app/api/v1/books/1',
+        'https://getspines.com/api/v1/books/1',
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: 'Bearer gtspn_test_abc123',
@@ -74,7 +74,7 @@ describe('SpinesClient', () => {
       const result = await client.post('/reading-lists', { book_id: 'b1', list_name: 'want_to_read' });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://spins.app/api/v1/reading-lists',
+        'https://getspines.com/api/v1/reading-lists',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ book_id: 'b1', list_name: 'want_to_read' }),

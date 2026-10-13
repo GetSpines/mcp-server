@@ -1,6 +1,6 @@
 {
   "name": "@spines/mcp-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "mcpName": "io.github.SuperAgentic/spines",
   "description": "MCP server for SPINES — access book collections, reading lists, and bookshelf recognition from AI assistants",
   "keywords": [

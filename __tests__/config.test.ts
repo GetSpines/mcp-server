@@ -21,7 +21,7 @@ describe('loadConfig', () => {
     process.env.SPINES_API_KEY = 'gtspn_live_test123';
     const config = loadConfig();
     expect(config.apiKey).toBe('gtspn_live_test123');
-    expect(config.apiUrl).toBe('https://spins.app/api/v1');
+    expect(config.apiUrl).toBe('https://getspines.com/api/v1');
     expect(config.debug).toBe(false);
   });
 

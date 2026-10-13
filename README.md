@@ -1,6 +1,6 @@
 # SPINES MCP Server
 
-Access [SPINES](https://spins.app) book collections, reading lists, and bookshelf data from AI assistants via the [Model Context Protocol](https://modelcontextprotocol.io).
+Access [SPINES](https://getspines.com) book collections, reading lists, and bookshelf data from AI assistants via the [Model Context Protocol](https://modelcontextprotocol.io).
 
 ## Features
 
@@ -15,7 +15,7 @@ Access [SPINES](https://spins.app) book collections, reading lists, and bookshel
 ### Prerequisites
 
 - Node.js 18+
-- A SPINES API key ([get one here](https://spins.app/settings/developer))
+- A SPINES API key ([get one here](https://getspines.com/settings/developer))
 
 ### Installation
 
@@ -64,7 +64,7 @@ Add to your MCP settings:
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `SPINES_API_KEY` | Yes | - | Your API key |
-| `SPINES_API_URL` | No | `https://spins.app/api/v1` | API base URL |
+| `SPINES_API_URL` | No | `https://getspines.com/api/v1` | API base URL |
 | `SPINES_DEBUG` | No | `false` | Verbose logging to stderr |
 
 ## Tools

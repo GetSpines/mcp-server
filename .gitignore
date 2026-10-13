@@ -1,3 +1,8 @@
 node_modules/
 dist/
 *.tsbuildinfo
+
+# MCP Registry publisher (credentials + binary) - never commit
+.mcpregistry_github_token
+.mcpregistry_registry_token
+mcp-publisher.exe
