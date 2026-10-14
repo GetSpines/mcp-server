@@ -12,6 +12,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { loadConfig } from './config.js';
 import { SpinesClient, SpinesApiError } from './client.js';
+import { VERSION } from './version.js';
 
 // Tools
 import { searchBooksSchema, searchBooksAnnotations, searchBooks } from './tools/search-books.js';
@@ -45,7 +46,7 @@ const client = new SpinesClient(config);
 
 const server = new McpServer({
   name: 'spines',
-  version: '1.0.0-beta.1',
+  version: VERSION,
 });
 
 // --- Helper: wrap tool handler with error handling ---
@@ -130,7 +131,7 @@ server.tool('get_book_pairings', 'Find books commonly co-shelved with a specific
   } catch (err) { return handleApiError(err); }
 });
 
-server.tool('recognize_bookshelf', 'Recognize books from a bookshelf image (uses daily credits or BYOK)', recognizeBookshelfSchema.shape, recognizeBookshelfAnnotations, async (args) => {
+server.tool('recognize_bookshelf', 'Recognize books from one or more photos of a bookshelf; several photos become one collection (uses daily credits or BYOK)', recognizeBookshelfSchema.shape, recognizeBookshelfAnnotations, async (args) => {
   try {
     return jsonResult(await recognizeBookshelf(client, config, args));
   } catch (err) { return handleApiError(err); }

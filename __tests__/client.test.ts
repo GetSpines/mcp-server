@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SpinesClient, SpinesApiError } from '../src/client.js';
+import { VERSION } from '../src/version.js';
 
 const mockConfig = {
   apiKey: 'gtspn_test_abc123',
@@ -81,6 +82,57 @@ describe('SpinesClient', () => {
         })
       );
       expect(result).toEqual({ id: '1', added: true });
+    });
+  });
+
+  describe('error details', () => {
+    it('keeps the API error details and shows them in the message', async () => {
+      const body = {
+        error: {
+          code: 'RECOGNIZE_IMAGE_DUPLICATE',
+          message: 'This image has already been uploaded',
+          details: { original_collection_id: 'c-orig', duplicate_image_index: 1 },
+        },
+      };
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(body), { status: 409 }));
+
+      const err = await client.post('/recognize', {}).catch((e) => e);
+
+      expect(err).toBeInstanceOf(SpinesApiError);
+      expect(err.details).toEqual({ original_collection_id: 'c-orig', duplicate_image_index: 1 });
+      expect(err.message).toContain('"duplicate_image_index":1');
+      expect(err.message).toContain('c-orig');
+    });
+  });
+
+  describe('timeouts', () => {
+    it('gives every request an abort signal and the current version in User-Agent', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ data: {} }), { status: 200 })
+      );
+
+      await client.get('/me/credits');
+
+      const init = (fetch as any).mock.calls[0][1];
+      expect(init.signal).toBeInstanceOf(AbortSignal);
+      expect(init.headers['User-Agent']).toBe(`@spines/mcp-server/${VERSION}`);
+    });
+
+    it('turns a timed-out request into a TIMEOUT SpinesApiError', async () => {
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(
+        new DOMException('The operation was aborted due to timeout', 'TimeoutError')
+      );
+
+      const err = await client.postWithHeaders('/recognize', {}, {}, { timeoutMs: 1000 }).catch((e) => e);
+
+      expect(err).toBeInstanceOf(SpinesApiError);
+      expect(err.code).toBe('TIMEOUT');
+      expect(err.message).toContain('/recognize');
+    });
+
+    it('rethrows network errors that are not timeouts', async () => {
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('fetch failed'));
+      await expect(client.get('/books/1')).rejects.toThrow('fetch failed');
     });
   });
 

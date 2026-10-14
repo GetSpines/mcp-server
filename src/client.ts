@@ -4,16 +4,25 @@
  */
 
 import type { Config } from './config.js';
+import { VERSION } from './version.js';
 
-const VERSION = '1.0.0-beta.1';
+/** Every request gets a deadline; a bare fetch could hang a tool call forever. */
+export const DEFAULT_TIMEOUT_MS = 30_000;
+
+export interface RequestOptions {
+  /** Overrides DEFAULT_TIMEOUT_MS for one slow call (recognition). */
+  timeoutMs?: number;
+}
 
 export class SpinesApiError extends Error {
   constructor(
     public status: number,
     public code: string,
     message: string,
+    /** The API's error.details, e.g. which photo of a request was a duplicate. Shown in the message so the assistant sees it. */
+    public details?: Record<string, unknown>,
   ) {
-    super(`SPINES API Error [${code}]: ${message}`);
+    super(`SPINES API Error [${code}]: ${message}${details ? ` ${JSON.stringify(details)}` : ''}`);
     this.name = 'SpinesApiError';
   }
 }
@@ -46,6 +55,20 @@ export class SpinesClient {
     }
   }
 
+  /** fetch with a deadline; a timeout becomes SpinesApiError TIMEOUT, other network errors pass through. */
+  private async send(method: string, path: string, url: string, init: RequestInit, opts?: RequestOptions): Promise<Response> {
+    this.log(method, path);
+    const timeoutMs = opts?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    try {
+      return await fetch(url, { ...init, method, signal: AbortSignal.timeout(timeoutMs) });
+    } catch (err) {
+      if (err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError')) {
+        throw new SpinesApiError(0, 'TIMEOUT', `${method} ${path} got no response within ${Math.round(timeoutMs / 1000)} s`);
+      }
+      throw err;
+    }
+  }
+
   private async handleResponse<T>(res: Response, path: string): Promise<T> {
     this.log(res.ok ? 'OK' : 'ERR', path, res.status);
 
@@ -57,6 +80,7 @@ export class SpinesClient {
         res.status,
         body.error?.code ?? 'UNKNOWN',
         body.error?.message ?? res.statusText,
+        body.error?.details,
       );
     }
 
@@ -72,35 +96,28 @@ export class SpinesClient {
       }
     }
 
-    this.log('GET', path);
-    const res = await fetch(url.toString(), { headers: this.headers() });
+    const res = await this.send('GET', path, url.toString(), { headers: this.headers() });
     return this.handleResponse<T>(res, path);
   }
 
   async post<T>(path: string, body: unknown): Promise<T> {
-    this.log('POST', path);
-    const res = await fetch(`${this.baseUrl}${path}`, {
-      method: 'POST',
+    const res = await this.send('POST', path, `${this.baseUrl}${path}`, {
       headers: this.headers(),
       body: JSON.stringify(body),
     });
     return this.handleResponse<T>(res, path);
   }
 
-  async postWithHeaders<T>(path: string, body: unknown, extraHeaders: Record<string, string>): Promise<T> {
-    this.log('POST', path);
-    const res = await fetch(`${this.baseUrl}${path}`, {
-      method: 'POST',
+  async postWithHeaders<T>(path: string, body: unknown, extraHeaders: Record<string, string>, opts?: RequestOptions): Promise<T> {
+    const res = await this.send('POST', path, `${this.baseUrl}${path}`, {
       headers: { ...this.headers(), ...extraHeaders },
       body: JSON.stringify(body),
-    });
+    }, opts);
     return this.handleResponse<T>(res, path);
   }
 
   async patch<T>(path: string, body: unknown): Promise<T> {
-    this.log('PATCH', path);
-    const res = await fetch(`${this.baseUrl}${path}`, {
-      method: 'PATCH',
+    const res = await this.send('PATCH', path, `${this.baseUrl}${path}`, {
       headers: this.headers(),
       body: JSON.stringify(body),
     });
@@ -108,9 +125,7 @@ export class SpinesClient {
   }
 
   async delete<T>(path: string): Promise<T> {
-    this.log('DELETE', path);
-    const res = await fetch(`${this.baseUrl}${path}`, {
-      method: 'DELETE',
+    const res = await this.send('DELETE', path, `${this.baseUrl}${path}`, {
       headers: this.headers(),
     });
     return this.handleResponse<T>(res, path);

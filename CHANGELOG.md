@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-14
+
+### Added
+- `recognize_bookshelf` accepts `images` (several photos of one bookshelf, saved as one collection) and `cover_index` (which photo is the cover). `image_url` / `image_base64` keep working for one photo. Needs the SPINES API from 2026-10-14 (developer changelog v1.3.0).
+- Every API request has a deadline: 30 s by default, 5 minutes for the `recognize_bookshelf` submission, which waits until the server has read every photo. A timeout returns error code `TIMEOUT`; for recognition it says to check `list_collections` before resending, because a retry is charged again.
+- README documents the five tools that were missing from it: `recognize_bookshelf`, `check_credits`, `get_book_pairings`, `get_persona`, `list_categories`, and the `SPINES_LLM_PROVIDER` / `SPINES_LLM_API_KEY` variables.
+
+### Fixed
+- `recognize_bookshelf` threw on the first failed status poll, so the assistant got an error and no `job_id` for a collection that had been created and charged. It now keeps polling through failed polls and, at the 2-minute deadline, returns the job's last known status with `last_poll_error`.
+- API error `details` were dropped. Errors now include them, e.g. `RECOGNIZE_IMAGE_DUPLICATE` names `duplicate_image_index` and `original_collection_id`.
+- The User-Agent and the MCP handshake reported version `1.0.0-beta.1`; both now report the package version (a test keeps `package.json`, `server.json` and the code in step).
+
 ## [1.0.3] - 2026-10-14
 
 ### Security
